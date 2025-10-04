@@ -12,14 +12,26 @@
 // to match your app's branding.
 // Tip: Use the "Theme Builder" on Quasar's documentation website.
 
-$primary: #1976d2;
-$secondary: #26a69a;
-$accent: #9c27b0;
+$primary   : #0090FF; // Light Blue
+$secondary : #9300B8; // Light Purple
+$accent    : #EE82EE; // Light Pink
 
-$dark: #1d1d1d;
-$dark-page: #121212;
+$dark      : #371561; // Dark Purple
+$dark-page : #13024F; // Dark Blue
 
-$positive: #21ba45;
-$negative: #c10015;
-$info: #31ccec;
-$warning: #f2c037;
+$positive  : #21BA45;
+$negative  : #C10015;
+$info      : #31CCEC;
+$warning   : #F2C037;
+
+// Global border radius
+$generic-border-radius: 20px !default;
+
+// Component-specific overrides
+$button-border-radius: $generic-border-radius !default;
+$card-border-radius: $generic-border-radius !default;
+$input-border-radius: $generic-border-radius !default;
+$table-border-radius: $generic-border-radius !default;
+$list-border-radius: $generic-border-radius !default;
+$menu-border-radius: $generic-border-radius !default;
+$tooltip-border-radius: $generic-border-radius !default;
