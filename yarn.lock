@@ -239,6 +239,11 @@
     "@eslint/core" "^0.16.0"
     levn "^0.4.1"
 
+"@fontsource/questrial@^5.2.8":
+  version "5.2.8"
+  resolved "https://registry.yarnpkg.com/@fontsource/questrial/-/questrial-5.2.8.tgz#d2b768dc467dc51e1b3481cdb58e102e21232ecf"
+  integrity sha512-KetCQoMwGVGRu7k71pDL3R9xQBaFw2jj7yL5KLLv+69RoGqYGldebfGiHspOjaZvSe355lLJ5qbatdYq+Bl+ZA==
+
 "@humanfs/core@^0.19.1":
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/@humanfs/core/-/core-0.19.1.tgz#17c55ca7d426733fe3c561906b8173c336b40a77"

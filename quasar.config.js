@@ -78,6 +78,11 @@ export default defineConfig((/* ctx */) => {
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
     framework: {
       config: {
+        typography: {
+          fontFamily: 'Questrial, sans-serif',
+          fontSize: '16px', // Base size
+          htmlFontSize: 16, // 1rem reference (browser default)
+        },
         notify: {
           position: 'bottom-right',
           timeout: 5000,
