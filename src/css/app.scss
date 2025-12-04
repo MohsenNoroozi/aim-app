@@ -85,3 +85,8 @@ input:-webkit-autofill:active {
   box-shadow: none !important;
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
+
+// custom scss colors
+.text-dark {color: $dark !important;} .bg-dark {background-color: $dark !important;}
+.text-dark-page {color: $dark-page !important;} .bg-dark-page {background-color: $dark-page !important;}
+.text-light-page {color: $light-page !important;} .bg-light-page {background-color: $light-page !important;}
