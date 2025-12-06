@@ -1,36 +1,69 @@
 <template>
   <div>
-    <div>Page {{ pageId }}</div>
-    <q-list v-if="page?.['questions']">
-      <q-item v-for="question in page.questions" :key="question.id">
-        <q-item-section>
-          <q-item-label>{{ question?.text ?? '' }}</q-item-label>
-        </q-item-section>
-      </q-item>
+    <div class="page-header q-mb-md">
+      <div class="row items-center justify-between q-mb-sm">
+        <div>
+          <div class="text-h6">Page {{ currentPage?.position ?? pageId }}</div>
+          <div class="text-caption text-grey-6">
+            {{ (currentPage?.questions || []).length }} questions on this page
+          </div>
+        </div>
+      </div>
+      <q-separator/>
+    </div>
+    <q-list v-if="currentPage?.['questions']">
+      <QuestionItem
+        v-for="(question, i) in currentPage['questions']"
+        :key="question.id"
+        :index="i + 1"
+        :model-value="modelValue[question.id] ?? null"
+        :question="question"
+        @update:model-value="val => onResponseChange(question.id, val)"
+      />
     </q-list>
   </div>
 </template>
 
 <script setup>
+import {computed} from "vue"
 import {useRoute} from "vue-router"
-import {ref, watch} from "vue"
+import QuestionItem from "pages/Assessment/QuestionItem.vue"
 
 const props = defineProps({
   assessment: {
     type: Object,
     default: () => ({pages: []})
+  },
+  modelValue: {
+    /** responses: { [questionId]: responseOptionId } */
+    type: Object,
+    default: () => ({})
   }
 })
 
-const route = useRoute()
-const page = ref({questions: []})
-const pageId = route.params?.['pageId'] ?? null
+const emit = defineEmits(['update:modelValue'])
 
-watch(() => props.assessment?.pages, v => {
-  page.value = v?.[pageId - 1]
-}, {immediate: true, deep: true})
+const route = useRoute()
+const pageId = computed(() => {
+  const raw = route.params?.['pageId']
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : 1
+})
+
+const currentPage = computed(() => (props.assessment?.pages ?? [])[pageId.value - 1] ?? {})
+
+function onResponseChange(questionId, optionId) {
+  // emit a new object (keeps things immutable / devtools-friendly)
+  emit('update:modelValue', {
+    ...props.modelValue,
+    [questionId]: optionId
+  })
+}
 </script>
 
 <style lang="scss" scoped>
-
+.page-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
 </style>

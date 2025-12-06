@@ -46,6 +46,10 @@ body {
   background-clip: padding-box;
 }
 
+body *::-webkit-scrollbar {
+  background-color: transparent !important;
+}
+
 // remove Chrome autofill background
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -84,6 +88,10 @@ input:-webkit-autofill:active {
 .q-dialog__inner {
   box-shadow: none !important;
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.q-tooltip {
+  z-index: 9999 !important;
 }
 
 // custom scss colors
