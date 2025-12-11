@@ -11,16 +11,22 @@ const routes = [
   },
   /* Assessment */
   {
-    path: '/assessment/:id',
-    props: true,
-    name: 'Assessment',
-    component: () => import('pages/Assessment/AssessmentPage.vue'),
+    path: '/assessment',
+    component: () => import('layouts/AssessmentLayout.vue'),
     children: [
       {
-        path: ':pageId',
+        path: ':uuid',
         props: true,
-        name: 'Assessment Page',
-        component: () => import('pages/Assessment/PageComponent.vue'),
+        name: 'Assessment',
+        component: () => import('pages/Assessment/AssessmentPage.vue'),
+        children: [
+          {
+            path: 'pages',
+            props: true,
+            name: 'Assessment Pages',
+            component: () => import('pages/Assessment/AssessmentPages.vue'),
+          },
+        ]
       },
     ]
   },
