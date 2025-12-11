@@ -60,10 +60,11 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import {useRoute} from 'vue-router'
 import {useQuasar} from 'quasar'
 import {api} from 'boot/xhr.js'
+import {buildMeta} from "boot/helper.js"
 import PageComponent from "pages/Assessment/PageComponent.vue"
 import AssessmentReview from "pages/Assessment/AssessmentReview.vue"
 
@@ -124,6 +125,8 @@ const goNext = () => {
 }
 
 const submit = () => {
+  const assessmentId = props.assessment?.id
+  const startTime = $q.localStorage.getItem(`assessment:${assessmentId}:startTime`)
   $q.dialog({
     title: 'Submit your answers?',
     message: 'Once submitted, you cannot make further changes.',
@@ -139,14 +142,44 @@ const submit = () => {
     },
     persistent: true
   }).onOk(() => {
-    const payload = Object.entries(responses.value).map(([questionId, responseOptionId]) => ({questionId, responseOptionId}))
     loading.value = 'submit'
     api()
-      .post(`/assessments/${route.params['uuid']}/submit`, {answers: payload})
-      .then(() => $q.notify({type: 'positive', message: 'Your responses have been submitted.'}))
+      .post(`/assessments/${route.params['uuid']}/submit`, {
+        answers: Object.entries(responses.value).map(([questionId, responseOptionId]) => ({questionId, responseOptionId})),
+        startedAt: startTime ? Number(startTime) : null,
+        meta: buildMeta()
+      })
+      .then(() => {
+        // $q.localStorage.removeItem(`assessment:${assessmentId}:startTime`)
+        // $q.localStorage.removeItem(`assessment:${assessmentId}:responses`)
+        // responses.value = {}
+        $q.notify({type: 'positive', message: 'Your responses have been submitted.'})
+      })
       .finally(() => loading.value = '')
   })
 }
+
+// Load responses from localStorage when assessment ID becomes available
+watch(() => props.assessment?.id, v => {
+    if (!v) return
+    const savedResponses = $q.localStorage.getItem(`assessment:${v}:responses`)
+    if (savedResponses) responses.value = savedResponses
+  },
+  {immediate: true}
+)
+
+// Detect first user response → save startTime once
+watch(() => responses.value, v => {
+    const assessmentId = props.assessment?.id
+    if (!assessmentId) return;
+    if (!$q.localStorage.getItem(`assessment:${assessmentId}:startTime`) && Object.values(v).length) {
+      $q.localStorage.setItem(`assessment:${assessmentId}:startTime`, Date.now())
+    }
+    $q.localStorage.setItem(`assessment:${assessmentId}:responses`, v)
+  },
+  {deep: true}
+)
+
 </script>
 
 <style lang="scss">
