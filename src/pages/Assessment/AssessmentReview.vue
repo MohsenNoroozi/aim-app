@@ -1,82 +1,78 @@
 <template>
   <div class="column fit">
-    <div class="col">
-      <div class="column fit">
-        <div class="col-auto row items-center q-mb-md">
-          <div class="col">
-            <div class="text-h6">Review your answers</div>
-            <div class="text-caption text-grey-7">
-              {{ answeredCount }} / {{ totalQuestions }} questions answered
-            </div>
-          </div>
+    <div class="col-auto q-mb-sm full-width">
+      <q-item class="q-pa-none">
+        <q-item-section>
+          <q-item-label lines="1" class="text-h6">Review your answers</q-item-label>
+          <q-item-label caption lines="1">{{ answeredCount }} / {{ totalQuestions }} questions answered</q-item-label>
+        </q-item-section>
+        <q-item-section side class="gt-sm">
+          <q-chip :color="allAnswered ? 'positive' : 'warning'" text-color="white" icon="task_alt">
+            {{ allAnswered ? 'All questions answered' : 'Some questions are missing' }}
+          </q-chip>
+        </q-item-section>
+      </q-item>
+    </div>
 
-          <div class="col-auto">
-            <q-chip :color="allAnswered ? 'positive' : 'warning'" text-color="white" icon="task_alt">
-              {{ allAnswered ? 'All questions answered' : 'Some questions are missing' }}
-            </q-chip>
-          </div>
-        </div>
+    <div class="col full-width">
+      <q-separator inset />
+      <q-list id="pages-wrapper">
+        <q-expansion-item v-for="(page, pageIndex) in assessment.pages || []" :key="page.id || pageIndex" default-opened class="bg-grey-2 rounded-borders q-my-md">
+          <template #header>
+            <q-item-section>
+              <q-item-label class="text-h6">{{ `Page ${pageIndex + 1}` }}</q-item-label>
+              <q-item-label caption>{{ pageCaption(page, pageIndex) }}</q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <q-btn outline size="sm" color="grey-7" icon="edit" label="EDIT PAGE" @click.stop="$emit('edit-page', pageIndex + 1)"/>
+            </q-item-section>
+          </template>
 
-        <q-list class="col overflow-auto">
-          <q-expansion-item v-for="(page, pageIndex) in assessment.pages || []" :key="page.id || pageIndex" default-opened class="bg-grey-2 rounded-borders q-mb-md">
-            <template #header>
-              <q-item-section>
-                <q-item-label class="text-h6">{{ `Page ${pageIndex + 1}` }}</q-item-label>
-                <q-item-label caption>{{ pageCaption(page, pageIndex) }}</q-item-label>
-              </q-item-section>
-
-              <q-item-section side>
-                <q-btn outline size="sm" color="primary" icon="edit" label="EDIT PAGE" @click.stop="$emit('edit-page', pageIndex + 1)"/>
-              </q-item-section>
-            </template>
-
-            <div class="q-pa-sm">
+          <div class="q-pa-sm">
             <q-list bordered class="bg-white" separator>
-              <q-item v-for="(question, j) in page?.['questions'] || []" :key="question.id" class="q-py-xs" clickable>
+              <q-item v-for="(question, j) in page?.['questions'] || []" :key="question.id" class="q-py-sm" clickable>
                 <q-item-section thumbnail>
-                  <q-avatar :text-color="responses[question.id] ? 'grey' : 'orange'" size="md" rounded class="q-px-sm">
+                  <q-avatar text-color="grey" size="sm" rounded class="q-px-sm">
                     <div class="text-subtitle1 text-bold">{{ j + 1 }}</div>
                   </q-avatar>
                 </q-item-section>
-
                 <q-item-section>
-                  <q-item-label class="text-body2">{{ question.text }}</q-item-label>
-                </q-item-section>
-
-                <q-item-section side>
-                  <q-item-label caption>
-                    <template v-if="responses[question.id]">
-                      <q-chip color="grey-2" text-color="primary">
-                        {{ getAnswerLabel(question) }}
-                      </q-chip>
-                    </template>
-                    <template v-else>
-                      <span class="text-orange">No answer provided</span>
-                    </template>
+                  <q-item-label class="text-body2 q-px-sm">{{ question.text }}</q-item-label>
+                  <q-item-label caption class="full-width">
+                    <q-chip v-if="responses[question.id]" color="grey-2">
+                      <q-avatar size="sm" rounded color="grey-3" text-color="grey-7">
+                        {{ (getAnswer(question)?.index ?? 0) + 1 }}
+                      </q-avatar>
+                      <div class="text-caption text-grey-9 ellipsis">{{ getAnswer(question)?.label ?? '' }}</div>
+                    </q-chip>
+                    <span v-else class="text-orange">No answer provided</span>
                   </q-item-label>
                 </q-item-section>
               </q-item>
             </q-list>
-            </div>
-            </q-expansion-item>
-        </q-list>
-      </div>
+          </div>
+        </q-expansion-item>
+      </q-list>
+      <q-separator inset />
     </div>
 
-    <div class="col-auto q-pt-md">
-      <div class="row items-center justify-between">
-        <div class="text-body2 text-grey-7">
-          You can still change your answers by editing pages above.
-        </div>
-        <q-btn
-          color="primary"
-          icon-right="send"
-          label="Submit answers"
-          :disable="!allAnswered || submitting"
-          :loading="submitting"
-          @click="emit('submit')"
-        />
-      </div>
+    <div class="col-auto">
+      <q-item dense>
+        <q-item-section>
+          <q-item-label lines="2" class="text-body2 text-grey-7 gt-xs">You can still change your answers by editing pages above.</q-item-label>
+        </q-item-section>
+        <q-item-section side>
+          <q-btn
+            color="primary"
+            icon-right="send"
+            label="Submit answers"
+            :disable="!allAnswered || submitting"
+            :loading="submitting"
+            @click="emit('submit')"
+            class="q-mt-sm"
+          />
+        </q-item-section>
+      </q-item>
     </div>
   </div>
 </template>
@@ -89,12 +85,10 @@ const props = defineProps({
     type: Object,
     required: true
   },
-  // { [questionId]: value }
   responses: {
     type: Object,
     required: true
   },
-  // parent tells us whether everything is answered
   allAnswered: {
     type: Boolean,
     default: false
@@ -147,31 +141,29 @@ function pageCaption(page, pageIndex) {
   return `${answered} / ${total} answered`
 }
 
-function getAnswerLabel(question) {
+function getAnswer(question) {
   const raw = props.responses?.[question.id]
   if (raw == null || raw === '') return ''
 
-  // Try to resolve option label if question has options
   const options = question.responseOptions || question.options || []
   if (Array.isArray(options) && options.length) {
-    const found = options.find(
-      opt => opt.id === raw || opt.value === raw
-    )
-    if (found) {
-      return found.label || found.text || String(raw)
-    }
+    const index = options.findIndex(opt => opt.id === raw || opt.value === raw)
+    return {label: options[index]?.label ?? String(raw), index}
   }
-
-  // Fallback to raw value
-  if (Array.isArray(raw)) {
-    return raw.join(', ')
-  }
-  return String(raw)
 }
 </script>
 
 <style scoped lang="scss">
 .q-expansion-item {
   border: none !important;
+}
+#pages-wrapper {
+  max-height: calc(100vh - 324px);
+  overflow-y: auto;
+}
+@media (max-width: 1024px) {
+  #pages-wrapper {
+    max-height: calc(100vh - 300px);
+  }
 }
 </style>

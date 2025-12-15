@@ -2,20 +2,22 @@
   <q-page>
     <div class="row">
       <div class="col-11 col-md-10 col-lg-9 col-xl-8 q-mx-auto">
-        <q-item style="height:80px">
+        <q-item class="q-px-none" style="height:80px">
           <q-item-section avatar>
             <img :src="assessment?.['organisation']?.['logo'] ?? '/images/logo.png'" alt=" " height="64px"/>
           </q-item-section>
           <q-item-section class="text-right">
             <q-item-label class="text-h6 text-white ellipsis">{{ assessment?.title }}</q-item-label>
-            <q-item-label class="text-subtitle2 text-grey-5">3 pages / {{ totalQuestions }} questions / ~{{ estimatedDurationMinutes }} minutes</q-item-label>
+            <q-item-label class="text-subtitle2 text-grey-5 ellipsis">{{ assessment?.pages?.length ?? 1 }} pages / {{ totalQuestions }} questions / ~{{ estimatedDurationMinutes }} minutes</q-item-label>
           </q-item-section>
         </q-item>
-        <router-view v-slot="{ Component }">
-          <component :is="Component" :assessment="assessment"/>
-        </router-view>
-        <div class="fixed-bottom text-caption text-center q-pa-sm">
-          <span class="text-grey">Powered by</span> AIM
+        <div style="margin-bottom:36px">
+          <router-view v-slot="{ Component }">
+            <component :is="Component" :assessment="assessment"/>
+          </router-view>
+        </div>
+        <div class="absolute-bottom text-caption text-center q-py-sm">
+          <PoweredLink />
         </div>
       </div>
     </div>
@@ -26,6 +28,7 @@
 import {computed, onMounted, ref} from "vue"
 import {useRoute} from "vue-router"
 import {api} from "boot/xhr.js"
+import PoweredLink from "components/PoweredLink.vue"
 
 const route = useRoute()
 const loading = ref(false)

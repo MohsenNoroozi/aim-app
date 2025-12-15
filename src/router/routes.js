@@ -5,6 +5,7 @@ const routes = [
     children: [
       {
         path: '',
+        name: 'Home',
         component: () => import('pages/IndexPage.vue')
       },
     ],
@@ -21,11 +22,26 @@ const routes = [
         component: () => import('pages/Assessment/AssessmentPage.vue'),
         children: [
           {
+            path: 'introduction',
+            name: 'Assessment Introduction',
+            component: () => import('pages/Assessment/AssessmentIntro.vue'),
+          },
+          {
             path: 'pages',
-            props: true,
             name: 'Assessment Pages',
             component: () => import('pages/Assessment/AssessmentPages.vue'),
           },
+          {
+            path: 'feedback/:submissionId',
+            props: true,
+            name: 'Assessment Feedback',
+            component: () => import('pages/Assessment/AssessmentFeedback.vue'),
+          },
+          {
+            path: 'confirmation',
+            name: 'Assessment Confirmation',
+            component: () => import('pages/Assessment/AssessmentConfirmation.vue'),
+          }
         ]
       },
     ]

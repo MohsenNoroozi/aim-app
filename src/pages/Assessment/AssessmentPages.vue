@@ -2,29 +2,29 @@
   <q-stepper
     v-model="currentStep"
     :contracted="$q.screen.lt.md"
-    animated
-    color="red"
-    active-icon="lens"
-    active-color="white"
-    done-color="grey-3"
-    inactive-color="grey-2"
     :header-nav="true"
+    active-color="white"
+    active-icon="lens"
     alternative-labels
-    keep-alive
-    flat
+    animated
     class="transparent"
+    color="red"
+    done-color="grey-3"
+    flat
+    inactive-color="grey-2"
     header-class="q-mb-sm"
+    keep-alive
   >
     <q-step
       v-for="(page, index) in assessment?.['pages'] || []"
       :key="page.id || index"
-      :done="isPageComplete(index + 1)"
       :disable="!isPageComplete(index)"
+      :done="isPageComplete(index + 1)"
       :name="'page-' + (index + 1)"
       :title="'Page ' + (index + 1)"
     >
-      <q-card class="page-card">
-        <q-card-section >
+      <q-card>
+        <q-card-section>
           <PageComponent
             v-model="responses"
             :assessment="assessment"
@@ -33,7 +33,8 @@
         </q-card-section>
         <q-card-actions align="right" class="q-mb-md">
           <q-btn v-if="currentStep !== 'page-1'" class="q-ml-sm" color="primary" flat label="Back" @click="goPrev"/>
-          <q-btn color="primary" label="Continue" icon-right="arrow_circle_right" padding="5px 16px" :disable="!isPageComplete(index + 1)" @click="goNext" />
+          <q-btn :disable="!isPageComplete(index + 1)" color="primary" icon-right="arrow_circle_right" label="Continue"
+                 padding="5px 16px" @click="goNext"/>
         </q-card-actions>
       </q-card>
     </q-step>
@@ -44,14 +45,14 @@
       title="Review"
     >
       <q-card>
-        <q-card-section class="page-card">
+        <q-card-section>
           <AssessmentReview
+            :all-answered="allQuestionsAnswered"
             :assessment="assessment"
             :responses="responses"
-            :all-answered="allQuestionsAnswered"
             :submitting="loading === 'submit'"
-            @edit-page="pageIndex => currentStep = 'page-' + pageIndex"
             @submit="submit"
+            @edit-page="pageIndex => currentStep = 'page-' + pageIndex"
           />
         </q-card-section>
       </q-card>
@@ -61,7 +62,7 @@
 
 <script setup>
 import {computed, ref, watch} from 'vue'
-import {useRoute} from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {useQuasar} from 'quasar'
 import {api} from 'boot/xhr.js'
 import {buildMeta} from "boot/helper.js"
@@ -77,6 +78,7 @@ const props = defineProps({
 
 const $q = useQuasar()
 const route = useRoute()
+const router = useRouter()
 const loading = ref('')
 const responses = ref({ /* [questionId]: responseOptionId */})
 const currentStep = ref('page-1')
@@ -102,8 +104,7 @@ const answeredCount = computed(() => {
 const allQuestionsAnswered = computed(() => totalQuestions.value > 0 && answeredCount.value === totalQuestions.value)
 
 const isPageComplete = pageNumber => {
-  const pages = props.assessment?.pages ?? []
-  const page = pages[pageNumber - 1]
+  const page = (props.assessment?.pages ?? [])[pageNumber - 1]
   if (!page || !Array.isArray(page?.['questions'])) return true
 
   return page?.['questions'].every(q => {
@@ -145,15 +146,17 @@ const submit = () => {
     loading.value = 'submit'
     api()
       .post(`/assessments/${route.params['uuid']}/submit`, {
-        answers: Object.entries(responses.value).map(([questionId, responseOptionId]) => ({questionId, responseOptionId})),
+        answers: Object.entries(responses.value).map(([questionId, responseOptionId]) => ({
+          questionId,
+          responseOptionId
+        })),
         startedAt: startTime ? Number(startTime) : null,
         meta: buildMeta()
       })
-      .then(() => {
-        // $q.localStorage.removeItem(`assessment:${assessmentId}:startTime`)
-        // $q.localStorage.removeItem(`assessment:${assessmentId}:responses`)
-        // responses.value = {}
-        $q.notify({type: 'positive', message: 'Your responses have been submitted.'})
+      .then(r => {
+        $q.localStorage.removeItem(`assessment:${assessmentId}:startTime`)
+        router.push({name: 'Assessment Feedback', params: {uuid: route.params['uuid'], submissionId: r.data.id}})
+        responses.value = {}
       })
       .finally(() => loading.value = '')
   })
@@ -179,28 +182,31 @@ watch(() => responses.value, v => {
   },
   {deep: true}
 )
-
 </script>
 
-<style lang="scss">
-.q-stepper__tab {
-  padding: 4px !important;
-  min-height: 0 !important;
-  .q-stepper__dot * {
-    color: $primary !important;
+<style lang="scss" scoped>
+:deep(.q-stepper__header) {
+  &.q-stepper__header--contracted {
+    min-height: 36px !important;
   }
-  .q-stepper__line:before, .q-stepper__line:after {
-    background: rgba(255, 255, 255, 0.275) !important;
+  .q-stepper__tab {
+    padding: 4px !important;
+    min-height: 0 !important;
+
+    .q-stepper__dot * {
+      color: $primary !important;
+    }
+
+    .q-stepper__line:before, .q-stepper__line:after {
+      background: rgba(255, 255, 255, 0.275) !important;
+    }
   }
 }
-.q-stepper__step-inner {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-.page-card {
-  height: calc(100vh - 196px) !important;
-  overflow-y: auto;
-  margin-top: 8px;
-  margin-bottom: 8px;
+
+:deep(.q-stepper__content) {
+  .q-stepper__step-inner {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
 }
 </style>

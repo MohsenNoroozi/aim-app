@@ -18,7 +18,7 @@
             </g>
           </svg>
           <div class="bg-white text-caption text-center q-pa-md">
-            <span class="text-grey">Powered by</span> AIM
+            <PoweredLink />
           </div>
         </div>
       </div>
@@ -27,21 +27,19 @@
 </template>
 
 <script setup>
-
+import PoweredLink from "components/PoweredLink.vue"
 </script>
 
 <style lang="scss" scoped>
 .bg-gradient {
   background: linear-gradient(60deg, rgba(84,58,183,1) 0%, rgba(0,172,193,1) 100%);
-  //background: linear-gradient(-45deg, #371561, #13024F);
-  //background-size: 400% 400%;
 }
 
 .waves {
   position:relative;
   width: 100%;
   height:15vh;
-  margin-bottom:-10px; /*Fix for safari gap*/
+  margin-bottom:-10px;
   min-height:100px;
   max-height:150px;
 }
