@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  assess-lite-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: assess-lite-app
+    restart: unless-stopped
+    expose:
+      - "80"
+    networks:
+      - traefik
+    labels:
+      - "traefik.enable=true"
+
+      # Router (Frontend rule)
+      - "traefik.http.routers.assess-lite-app.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.routers.assess-lite-app.entrypoints=websecure"
+      - "traefik.http.routers.assess-lite-app.tls.certresolver=myresolver"
+
+      # Service (Backend target inside container)
+      - "traefik.http.services.assess-lite-app.loadbalancer.server.port=80"
+      - "traefik.http.services.assess-lite-app.loadbalancer.server.scheme=http"
+
+      # Optional: redirect HTTP → HTTPS (for better UX)
+      - "traefik.http.routers.assess-lite-app-redirect.rule=Host(`${TRAEFIK_HOST}`)"
+      - "traefik.http.routers.assess-lite-app-redirect.entrypoints=web"
+      - "traefik.http.routers.assess-lite-app-redirect.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+networks:
+  traefik:
+    external: true
