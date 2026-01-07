@@ -158,12 +158,12 @@ function getAnswer(question) {
   border: none !important;
 }
 #pages-wrapper {
-  max-height: calc(100vh - 324px);
+  max-height: calc(100vh - 332px);
   overflow-y: auto;
 }
 @media (max-width: 1024px) {
   #pages-wrapper {
-    max-height: calc(100vh - 300px);
+    max-height: calc(100vh - 308px);
   }
 }
 </style>

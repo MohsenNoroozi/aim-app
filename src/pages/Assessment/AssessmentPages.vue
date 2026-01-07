@@ -1,5 +1,6 @@
 <template>
   <q-stepper
+    v-if="!assessmentLoading"
     v-model="currentStep"
     :contracted="$q.screen.lt.md"
     :header-nav="true"
@@ -12,7 +13,7 @@
     done-color="grey-3"
     flat
     inactive-color="grey-2"
-    header-class="q-mb-sm"
+    header-class="q-my-sm"
     keep-alive
   >
     <q-step
@@ -25,16 +26,18 @@
     >
       <q-card>
         <q-card-section>
-          <PageComponent
-            v-model="responses"
-            :assessment="assessment"
-            :page-index="index"
-          />
+          <transition appear :name="transitionName" mode="out-in">
+            <PageComponent
+              key="assessment-pages-content"
+              v-model="responses"
+              :assessment="assessment"
+              :page-index="index"
+            />
+          </transition>
         </q-card-section>
         <q-card-actions align="right" class="q-mb-md">
           <q-btn v-if="currentStep !== 'page-1'" class="q-ml-sm" color="primary" flat label="Back" @click="goPrev"/>
-          <q-btn :disable="!isPageComplete(index + 1)" color="primary" icon-right="arrow_circle_right" label="Continue"
-                 padding="5px 16px" @click="goNext"/>
+          <q-btn :disable="!isPageComplete(index + 1)" color="primary" icon-right="arrow_circle_right" label="Continue" padding="5px 16px" @click="goNext"/>
         </q-card-actions>
       </q-card>
     </q-step>
@@ -58,6 +61,49 @@
       </q-card>
     </q-step>
   </q-stepper>
+
+  <template v-else>
+    <q-toolbar class="toolbar-skeleton q-mb-xs-xs q-mb-md-lg q-px-none">
+      <svg class="toolbar-line" viewBox="0 0 100 1" preserveAspectRatio="none">
+        <defs>
+          <mask id="line-mask">
+            <rect x="16.66" y="0" width="66.68" height="1" fill="white" />
+
+            <circle cx="16.66" cy="0.5" r="4" fill="black" />
+            <circle cx="49.98" cy="0.5" r="4" fill="black" />
+            <circle cx="83.34" cy="0.5" r="4" fill="black" />
+          </mask>
+        </defs>
+
+        <rect x="0" y="0" width="100" height="1" fill="white" mask="url(#line-mask)"/>
+      </svg>
+
+      <q-toolbar-title class="q-mx-lg q-px-none skeleton-wrapper">
+        <q-skeleton type="QAvatar" size="24px" animation="pulse" />
+      </q-toolbar-title>
+
+      <q-toolbar-title class="q-mx-lg q-px-none skeleton-wrapper">
+        <q-skeleton type="QAvatar" size="24px" animation="pulse" />
+      </q-toolbar-title>
+
+      <q-toolbar-title class="q-mx-lg q-px-none skeleton-wrapper">
+        <q-skeleton type="QAvatar" size="24px" animation="pulse" />
+      </q-toolbar-title>
+    </q-toolbar>
+
+    <q-card style="min-height:50vh;max-height:calc(100vh - 200px)">
+      <q-card-actions align="center">
+        <q-inner-loading class="transparent" showing transition-duration="500" style="max-height:80vh">
+          <template v-slot:default>
+            <div class="text-center">
+              <q-spinner-hourglass color="grey-9" size="1.5em"/>
+              <div class="text-grey-9">Loading, Please wait...</div>
+            </div>
+          </template>
+        </q-inner-loading>
+      </q-card-actions>
+    </q-card>
+  </template>
 </template>
 
 <script setup>
@@ -73,6 +119,10 @@ const props = defineProps({
   assessment: {
     type: Object,
     required: true,
+  },
+  assessmentLoading: {
+    type: Boolean,
+    default: false,
   }
 })
 
@@ -82,6 +132,7 @@ const router = useRouter()
 const loading = ref('')
 const responses = ref({ /* [questionId]: responseOptionId */})
 const currentStep = ref('page-1')
+const transitionName = ref('collapse-down')
 
 const steps = computed(() => [
   ...(props.assessment?.pages ?? []).map((_, index) => `page-${index + 1}`),
@@ -155,7 +206,7 @@ const submit = () => {
       })
       .then(r => {
         $q.localStorage.removeItem(`assessment:${assessmentId}:startTime`)
-        router.push({name: 'Assessment Feedback', params: {uuid: route.params['uuid'], submissionId: r.data.id}})
+        router.replace({name: 'Assessment Feedback', params: {uuid: route.params['uuid'], submissionUuid: r.data.uuid}})
         responses.value = {}
       })
       .finally(() => loading.value = '')
@@ -182,6 +233,9 @@ watch(() => responses.value, v => {
   },
   {deep: true}
 )
+
+// don't animate the page after currentStep changed
+watch(() => currentStep.value, () => transitionName.value = 'none')
 </script>
 
 <style lang="scss" scoped>
@@ -209,4 +263,30 @@ watch(() => responses.value, v => {
     margin: 0 !important;
   }
 }
+
+.toolbar-skeleton {
+  position: relative;
+  height: 48px;
+}
+
+.toolbar-line {
+  margin: 0 !important;
+  position: absolute;
+  width: 100% !important;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.skeleton-wrapper {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+}
+
+
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="column q-mx-auto" style="max-width:650px">
     <div class="col-auto header-card q-py-xs-sm q-py-md-md q-pr-md">
-      <q-item dense>
+      <q-item v-if="!checkSubmissionLoading">
         <q-item-section avatar>
           <q-avatar class="success-badge" size="48px">
             <q-icon color="white" name="verified" size="36px"/>
@@ -20,11 +20,21 @@
           </transition>
         </q-item-section>
       </q-item>
+
+      <q-item v-else dense>
+        <q-item-section avatar>
+          <q-skeleton type="QAvatar" size="48px" animation="pulse" />
+        </q-item-section>
+        <q-item-section>
+          <q-skeleton type="text" square width="80%" height="36px" animation="fade" />
+          <q-skeleton type="text" square width="40%" height="26px" animation="fade" />
+        </q-item-section>
+      </q-item>
     </div>
 
-    <q-card bordered class="col overflow-auto">
+    <q-card v-if="!checkSubmissionLoading" bordered class="col overflow-auto">
       <q-card-section class="q-pa-xs-lg q-pa-md-xl">
-        <transition appear mode="out-in" name="collapse-up">
+        <transition appear mode="out-in" name="collapse-down">
           <div v-if="!submitted" key="form">
             <div class="text-center">
               <div class="text-body1 text-grey-8 q-mb-sm">
@@ -191,11 +201,24 @@
         </transition>
       </q-card-section>
     </q-card>
+
+    <q-card v-else style="min-height:50vh;max-height:calc(100vh - 242px)">
+      <q-card-actions align="center">
+        <q-inner-loading class="transparent" showing transition-duration="500" style="max-height:80vh">
+          <template v-slot:default>
+            <div class="text-center">
+              <q-spinner-hourglass color="grey-7" size="1.5em"/>
+              <div class="text-grey-7">Loading, Please wait...</div>
+            </div>
+          </template>
+        </q-inner-loading>
+      </q-card-actions>
+    </q-card>
   </div>
 </template>
 
 <script setup>
-import {computed, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import {useRoute, useRouter} from 'vue-router'
 import {api} from 'boot/xhr.js'
 import AssessmentConfirmation from "pages/Assessment/AssessmentConfirmation.vue"
@@ -203,6 +226,7 @@ import AssessmentConfirmation from "pages/Assessment/AssessmentConfirmation.vue"
 const route = useRoute()
 const router = useRouter()
 const loading = ref(false)
+const checkSubmissionLoading = ref(false)
 const submitted = ref(false)
 
 const rating = ref(0)
@@ -260,14 +284,30 @@ const sendFeedback = () => {
   const experience = [clarity.value, length.value, ...otherReasons.value].filter(Boolean)
   loading.value = true
   api()
-    .put(`/submissions/${route.params['submissionId']}`, {
+    .put(`/assessments/${route.params['uuid']}/submissions/${route.params['submissionUuid']}`, {
       satisfaction: rating.value,
       feedback: (comment.value ?? '').trim() || null,
       experience
     })
     .then(() => submitted.value = true)
+    .catch(err => {
+      if (err.status === 409) router.replace({name: 'Home'})
+    })
     .finally(() => loading.value = false)
 }
+
+onMounted(() => {
+  checkSubmissionLoading.value = true
+  api()
+    .get(`/assessments/${route.params['uuid']}/submissions/${route.params['submissionUuid']}`)
+    .then(r => {
+      if (r?.data?.satisfaction) {
+        submitted.value = true
+      }
+    })
+    .catch(() => router.replace({name: 'Home'}))
+    .finally(() => checkSubmissionLoading.value = false)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -309,68 +349,5 @@ const sendFeedback = () => {
 }
 
 /* Base reveal animation */
-.reveal-x-enter-active,
-.reveal-x-leave-active,
-.reveal-x-appear-active {
-  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-  opacity 0.25s ease;
-  will-change: clip-path, opacity;
-}
 
-.reveal-x-enter-from,
-.reveal-x-leave-to,
-.reveal-x-appear-from {
-  clip-path: inset(0 100% 0 0);
-  opacity: 0;
-}
-
-.reveal-x-enter-to,
-.reveal-x-leave-from,
-.reveal-x-appear-to {
-  clip-path: inset(0 0 0 0);
-  opacity: 1;
-}
-
-.header-title.reveal-x-leave-active,
-.header-title.reveal-x-leave-to {
-  transition-delay: 60ms;
-}
-.header-sub-delayed.reveal-x-enter-active,
-.header-sub-delayed.reveal-x-appear-active {
-  transition-delay: 120ms;
-}
-
-/* form collapse from bottom (scaleY) */
-.collapse-up-enter-active,
-.collapse-up-leave-active {
-  transition: transform 0.35s ease, opacity 0.25s ease;
-  transform-origin: bottom;
-}
-
-.collapse-up-enter-from,
-.collapse-up-leave-to {
-  transform: scaleY(0.85);
-  opacity: 0;
-}
-
-.collapse-up-enter-to,
-.collapse-up-leave-from {
-  transform: scaleY(1);
-  opacity: 1;
-}
-
-/* confirmation subtle slide + fade */
-.fade-up-enter-active {
-  transition: transform 0.28s ease, opacity 0.28s ease;
-}
-
-.fade-up-enter-from {
-  transform: translateY(10px);
-  opacity: 0;
-}
-
-.fade-up-enter-to {
-  transform: translateY(0);
-  opacity: 1;
-}
 </style>

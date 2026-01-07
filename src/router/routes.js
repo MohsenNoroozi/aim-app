@@ -27,12 +27,17 @@ const routes = [
             component: () => import('pages/Assessment/AssessmentIntro.vue'),
           },
           {
+            path: 'introduction2',
+            name: 'Assessment Introduction2',
+            component: () => import('pages/Assessment/AssessmentIntro2.vue'),
+          },
+          {
             path: 'pages',
             name: 'Assessment Pages',
             component: () => import('pages/Assessment/AssessmentPages.vue'),
           },
           {
-            path: 'feedback/:submissionId',
+            path: 'feedback/:submissionUuid',
             props: true,
             name: 'Assessment Feedback',
             component: () => import('pages/Assessment/AssessmentFeedback.vue'),

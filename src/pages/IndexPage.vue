@@ -33,9 +33,9 @@
         </q-card>
         <div class="text-center text-grey q-my-lg">
           <div class="text-caption">
-            <a class="text-blue-3" href="#">About Us</a> &nbsp;•&nbsp;
-            <a class="text-blue-3" href="#">Terms & Conditions</a> &nbsp;•&nbsp;
-            <a class="text-blue-3" href="#">Contact</a>
+            <a class="text-blue-3 no-decoration" href="#">About Us</a> &nbsp;•&nbsp;
+            <a class="text-blue-3 no-decoration" href="#">Terms & Conditions</a> &nbsp;•&nbsp;
+            <a class="text-blue-3 no-decoration" href="#">Contact</a>
           </div>
         </div>
       </q-form>
@@ -76,10 +76,7 @@ const onSubmit = () => {
   opacity: 0.4;
 }
 
-a {
-  text-decoration: none;
-  &:hover {
-    color: white !important;
-  }
+a:hover {
+  color: white !important;
 }
 </style>

@@ -1,4 +1,3 @@
-// app global css in SCSS form
 @import '@fontsource/questrial';  /*yarn add @fontsource/questrial*/
 
 :root {
@@ -19,7 +18,7 @@ body {
   line-height: 1.6;
 }
 
-// scrollbar
+/* ===== scrollbar ===== */
 ::-webkit-scrollbar {
   height: 12px;
   width: 14px;
@@ -50,7 +49,7 @@ body *::-webkit-scrollbar {
   background-color: transparent !important;
 }
 
-// remove Chrome autofill background
+/* ===== remove Chrome autofill background ===== */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -60,7 +59,7 @@ input:-webkit-autofill:active {
   box-shadow: inset 0 0 20px 20px rgba(0, 0, 0, 0);
 }
 
-// custom adjustments
+/* ===== custom adjustments ===== */
 .q-input, .q-field {
   .q-field__control {
     border-radius: $generic-border-radius !important;
@@ -94,7 +93,91 @@ input:-webkit-autofill:active {
   z-index: 9999 !important;
 }
 
-// custom scss colors
+/* ===== custom scss colors ===== */
 .text-dark {color: $dark !important;} .bg-dark {background-color: $dark !important;}
 .text-dark-page {color: $dark-page !important;} .bg-dark-page {background-color: $dark-page !important;}
 .text-light-page {color: $light-page !important;} .bg-light-page {background-color: $light-page !important;}
+
+
+/* ===== Animations ===== */
+.reveal-x-enter-active,
+.reveal-x-leave-active,
+.reveal-x-appear-active {
+  transition: clip-path 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+  opacity 0.25s ease;
+  will-change: clip-path, opacity;
+}
+.reveal-x-enter-from,
+.reveal-x-leave-to,
+.reveal-x-appear-from {
+  clip-path: inset(0 100% 0 0);
+  opacity: 0;
+}
+.reveal-x-enter-to,
+.reveal-x-leave-from,
+.reveal-x-appear-to {
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+}
+.header-title.reveal-x-leave-active,
+.header-title.reveal-x-leave-to {
+  transition-delay: 60ms;
+}
+.header-sub-delayed.reveal-x-enter-active,
+.header-sub-delayed.reveal-x-appear-active {
+  transition-delay: 120ms;
+}
+
+.collapse-up-enter-active,
+.collapse-up-leave-active {
+  transition: transform 0.35s ease, opacity 0.25s ease;
+  transform-origin: bottom;
+}
+.collapse-up-enter-from,
+.collapse-up-leave-to {
+  transform: scaleY(0.85);
+  opacity: 0;
+}
+.collapse-up-enter-to,
+.collapse-up-leave-from {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+.collapse-down-enter-active,
+.collapse-down-leave-active {
+  transition: transform 0.35s ease, opacity 0.25s ease;
+  transform-origin: top;
+}
+.collapse-down-enter-from,
+.collapse-down-leave-to {
+  transform: scaleY(0.85);
+  opacity: 0;
+}
+.collapse-down-enter-to,
+.collapse-down-leave-from {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+/* confirmation subtle slide + fade */
+.fade-up-enter-active {
+  transition: transform 0.28s ease, opacity 0.28s ease;
+}
+
+.fade-up-enter-from {
+  transform: translateY(10px);
+  opacity: 0;
+}
+
+.fade-up-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+
+/* ===== custom classes ===== */
+.no-decoration {
+  text-decoration: none !important;
+  color: inherit !important;
+}

@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat dense no-caps padding="0 24px" :href="landingUrl" class="text-grey">
+  <q-btn flat dense no-caps padding="0 24px" :href="landingUrl" class="text-caption text-grey">
     Powered by <strong class="q-px-xs text-grey-7">{{ appName }}</strong>
   </q-btn>
 </template>
