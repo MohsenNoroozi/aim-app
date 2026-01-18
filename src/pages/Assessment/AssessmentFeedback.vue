@@ -281,13 +281,16 @@ const selectedRating = computed(() => {
 const goHome = () => router.replace({name: 'Home'})
 
 const sendFeedback = () => {
-  const experience = [clarity.value, length.value, ...otherReasons.value].filter(Boolean)
   loading.value = true
   api()
     .put(`/assessments/${route.params['uuid']}/submissions/${route.params['submissionUuid']}`, {
       satisfaction: rating.value,
       feedback: (comment.value ?? '').trim() || null,
-      experience
+      experience: {
+        clarity: clarity.value,
+        length: length.value,
+        otherReasons: [...otherReasons.value].filter(Boolean)
+      }
     })
     .then(() => submitted.value = true)
     .catch(err => {
