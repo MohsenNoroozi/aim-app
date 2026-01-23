@@ -22,7 +22,7 @@
       :disable="!isPageComplete(index)"
       :done="isPageComplete(index + 1)"
       :name="'page-' + (index + 1)"
-      :title="'Page ' + (index + 1)"
+      :title="page.title || page?.pillar?.name || 'Page ' + (index + 1)"
     >
       <q-card>
         <q-card-section>
