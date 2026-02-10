@@ -1,7 +1,7 @@
 <template>
   <div class="column fit">
     <div class="col-auto q-my-lg">
-      <q-img alt="AIM" fit="scale-down" height="128px" src="images/logo.png"/>
+      <q-img alt="AIM" fit="scale-down" height="128px" src="images/default_logo.png"/>
     </div>
 
     <div class="col column justify-center">

@@ -5,7 +5,7 @@
 
         <q-item v-if="!loading" class="q-px-none" style="height:80px">
           <q-item-section avatar>
-            <img :src="assessment?.['organisation']?.['logo'] ?? '/images/logo.png'" alt=" " height="64px"/>
+            <img :src="assessment?.['organisation']?.['logo'] ?? '/images/default_logo.png'" alt=" " height="64px"/>
           </q-item-section>
           <q-item-section class="text-right">
             <q-item-label class="text-h6 text-white ellipsis">
