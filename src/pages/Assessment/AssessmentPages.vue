@@ -234,8 +234,10 @@ watch(() => responses.value, v => {
   {deep: true}
 )
 
-// don't animate the page after currentStep changed
-watch(() => currentStep.value, () => transitionName.value = 'none')
+watch(() => currentStep.value, () => {
+  transitionName.value = 'none' // don't animate the page after currentStep changed
+  window.scrollTo({ top: 0 })
+})
 </script>
 
 <style lang="scss" scoped>
