@@ -228,8 +228,11 @@
 </template>
 
 <script setup>
-import { computed, inject } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {computed, inject, ref} from 'vue'
+import {useQuasar} from "quasar"
+import {useRoute, useRouter} from 'vue-router'
+import {api} from "boot/xhr.js"
+import {buildMeta} from "boot/helper.js"
 
 defineProps({
   assessment: {
@@ -245,12 +248,26 @@ defineProps({
 const totalQuestions = inject('totalQuestions', null)
 const estimatedDuration = inject('estimatedDuration', null)
 
+const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
+const loading = ref('')
 
 const uuid = computed(() => route.params?.uuid || route.params?.assessmentUuid || null)
 
-const startAssessment = () => router.push({ name: 'Assessment Pages', params: { uuid: uuid.value } })
+const startAssessment = () => {
+  loading.value = 'startAssessment'
+  api()
+      .post(`/assessments/${route.params['uuid']}/submissions`, {
+        startedAt: Date.now(),
+        meta: buildMeta()
+      })
+      .then(r => {
+        $q.localStorage.setItem(`submission:uuid`, r.data?.uuid ?? '')
+        router.push({name: 'Assessment Pages', params: {uuid: uuid.value}})
+      })
+      .finally(() => loading.value = '')
+}
 
 const goHome = () => router.replace({ name: 'Home' })
 </script>

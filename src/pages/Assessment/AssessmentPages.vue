@@ -177,8 +177,6 @@ const goNext = () => {
 }
 
 const submit = () => {
-  const assessmentId = props.assessment?.id
-  const startTime = $q.localStorage.getItem(`assessment:${assessmentId}:startTime`)
   $q.dialog({
     title: 'Submit your answers?',
     message: 'Once submitted, you cannot make further changes.',
@@ -197,17 +195,17 @@ const submit = () => {
     loading.value = 'submit'
     api()
       .post(`/assessments/${route.params['uuid']}/submit`, {
+        uuid: $q.localStorage.getItem(`submission:uuid`),
         answers: Object.entries(responses.value).map(([questionId, responseOptionId]) => ({
           questionId,
           responseOptionId
         })),
-        startedAt: startTime ? Number(startTime) : null,
         meta: buildMeta()
       })
       .then(r => {
-        $q.localStorage.removeItem(`assessment:${assessmentId}:startTime`)
+        $q.localStorage.removeItem(`submission:uuid`)
+        // responses.value = {}
         router.replace({name: 'Assessment Feedback', params: {uuid: route.params['uuid'], submissionUuid: r.data.uuid}})
-        responses.value = {}
       })
       .finally(() => loading.value = '')
   })
@@ -222,13 +220,9 @@ watch(() => props.assessment?.id, v => {
   {immediate: true}
 )
 
-// Detect first user response → save startTime once
 watch(() => responses.value, v => {
     const assessmentId = props.assessment?.id
     if (!assessmentId) return;
-    if (!$q.localStorage.getItem(`assessment:${assessmentId}:startTime`) && Object.values(v).length) {
-      $q.localStorage.setItem(`assessment:${assessmentId}:startTime`, Date.now())
-    }
     $q.localStorage.setItem(`assessment:${assessmentId}:responses`, v)
   },
   {deep: true}
