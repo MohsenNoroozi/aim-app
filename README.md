@@ -1,4 +1,4 @@
-# Assess Lite - App (assess-lite-app)
+# Aim - App
 
 Lightweight Likert assessment platform for orgs with intro, questions, demographics, and outro pages, anonymous responses, and simple analytics.
 

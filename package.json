@@ -1,8 +1,8 @@
 {
-  "name": "assess-lite-app",
+  "name": "aim-app",
   "version": "0.0.1",
   "description": "Lightweight Likert assessment platform for orgs with intro, questions, demographics, and outro pages, anonymous responses, and simple analytics.",
-  "productName": "Assess Lite - App",
+  "productName": "Aim - App",
   "author": "Mohsen Noroozieghbali <mohsen.noroozi@crownfinancial.co.nz>",
   "type": "module",
   "private": true,
