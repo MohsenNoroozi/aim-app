@@ -204,7 +204,7 @@ const submit = () => {
       })
       .then(r => {
         $q.localStorage.removeItem(`submission:uuid`)
-        // responses.value = {}
+        responses.value = {}
         router.replace({name: 'Assessment Feedback', params: {uuid: route.params['uuid'], submissionUuid: r.data.uuid}})
       })
       .finally(() => loading.value = '')
